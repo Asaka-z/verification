@@ -1,0 +1,48 @@
+// 去除对象中的空值, 空值包括空字符串，undefined, null
+export function removeEmptyValue (obj) {
+    const data = Object.assign({}, obj);
+    for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+            let ele = data[key];
+            if (typeof ele === 'string') {
+                ele = ele.trim();
+                data[key] = ele;
+                if ([undefined, null, ''].includes(ele)) {
+                    delete data[key];
+                }
+            } else if (Object.prototype.toString.call(ele) === '[object Object]') {
+                data[key] = removeEmptyValue(ele);
+            }
+        }
+    }
+    return data;
+};
+
+
+// 去除提交金额最后的小数点，如`23.`转换成`23`
+export function removeAmountLastPoint (ele) {
+    let index = ele.indexOf('.');
+    if (index === (ele.length - 1)) {
+        ele = ele.slice(0, ele.length - 1);
+    }
+    return ele;
+}
+
+export function hasStringValue (str) {
+    return typeof str === 'string' && str.trim() !== '';
+};
+const checkEmail = (value) => { // 验证邮箱，返回布尔值 使用后台的验证正则，保持统一
+    return /^([A-Za-z0-9])+([A-Za-z0-9_\-\.\+])*\@([A-Za-z0-9])+\.([A-Za-z0-9])+([A-Za-z0-9\.])*$/.test(value);
+};
+
+export { checkEmail };
+
+export const validateEmail = (rule, value, callback) => {
+    if (value === '') {
+        return callback(i18n.t('Tips.enter_email'));
+    }
+    if (!checkEmail(value)) {
+        return callback(new Error(i18n.t('the_password')));
+    }
+    callback();
+};
